@@ -1,47 +1,50 @@
 display.setStatusBar(display.HiddenStatusBar)
 
+_W=display.contentWidth;
+_H=display.contentHeight;
+
+gridStrokeWidth=5
+gridStrokeColor={0.9,0.7,0.4,1}
 local mapSize=3
-local line1=display.newLine(display.contentWidth/mapSize,0,display.contentWidth/mapSize,display.contentHeight)
-line1.strokeWidth=5
-local line1=display.newLine(2*display.contentWidth/mapSize,0,2*display.contentWidth/mapSize,display.contentHeight)
-line1.strokeWidth=5
-local line1=display.newLine(0,display.contentHeight/mapSize,display.contentWidth,display.contentHeight/mapSize)
-line1.strokeWidth=5
-local line1=display.newLine(0,2*display.contentHeight/mapSize,display.contentWidth,2*display.contentHeight/mapSize)
-line1.strokeWidth=5
+rectangleScale=1.2
+
+for i=1,mapSize-1 do
+    local line1=display.newLine(i*_W/mapSize,0,i*_W/mapSize,_H)
+    line1:setStrokeColor(unpack(gridStrokeColor))
+    line1.strokeWidth=gridStrokeWidth
+    local line1=display.newLine(0,i*_H/mapSize,_W,i*_H/mapSize)
+    line1:setStrokeColor(unpack(gridStrokeColor))
+    line1.strokeWidth=gridStrokeWidth
+end
 
 local currentStepSymbol='X'
 local myRectangle={}
 local cellMarker={}
-for i=1,3 do
+for i=1,mapSize do
     myRectangle[i]={}
     cellMarker[i]={}
-    for j=1,3 do
+    for j=1,mapSize do
         myRectangle[i][j]=
-        display.newRect((i-1)*display.contentWidth/6+i*display.contentWidth/6,
-            (j-1)*display.contentHeight/6+j*display.contentHeight/6,
-            1.2*display.contentWidth/6,
-        1.2*display.contentHeight/6)
+        display.newRect((i-1)*_W/6+i*_W/6,(j-1)*_H/6+j*_H/6,rectangleScale*_W/6,rectangleScale*_H/6)
         myRectangle[i][j]:setFillColor(0)
         cellMarker[i][j]=i..j
         
         local function listener(event)
-            for i=1,3 do
+            for i=1,mapSize do
                 for key,val in pairs(myRectangle[i]) do
                     if val==event.target and cellMarker[key][i]~="X" and cellMarker[key][i]~="O" then
-                        local tapSymbol=display.newText(currentStepSymbol,display.contentCenterX,display.contentHeight/2,native.systemFont,100)
+                        local tapSymbol=display.newText(currentStepSymbol,display.contentCenterX,_H/2,native.systemFont,100)
                         cellMarker[key][i]=tapSymbol.text
                         tapSymbol.x,tapSymbol.y=event.x,event.y --кординаты символа = координаты события
                         if currentStepSymbol=='X' then currentStepSymbol="O"
                         else currentStepSymbol='X'
                         end
                         if(gameWinCheck(cellMarker)~=nil) then
-                            local gameEndText=display.newText(cellMarker[key][i].."-s Wins",display.contentCenterX,display.contentHeight/2,native.systemFont,50)
+                            local gameEndText=display.newText(cellMarker[key][i].."-s Wins",display.contentCenterX,_H/2,native.systemFont,50)
                             drawWinLine(gameWinCheck(cellMarker))
                             gameEndText:setFillColor(1,0,0)
                         elseif (gameIsEnd(cellMarker)) then
-                            print("game end")
-                            local gameEndText=display.newText("Draw",display.contentCenterX,display.contentHeight/2,native.systemFont,50)
+                            local gameEndText=display.newText("Draw",display.contentCenterX,_H/2,native.systemFont,50)
                             gameEndText:setFillColor(1,0,0)
                         end
                     end
@@ -64,10 +67,10 @@ function drawWinLine(coords)
     local numOfLines=math.random(3,7)
     local randomScale=0.7
     for i=1,numOfLines,1 do
-        CoordsY[#CoordsY+1]=(2*y1-1)*display.contentWidth/(2*mapSize)+randomScale*math.random(-display.contentHeight/6,display.contentHeight/6)
-        CoordsX[#CoordsX+1]=(2*x1-1)*display.contentHeight/(2*mapSize)+randomScale*math.random(-display.contentWidth/6,display.contentWidth/6)
-        CoordsY[#CoordsY+1]=(2*y2-1)*display.contentWidth/(2*mapSize)+randomScale*math.random(-display.contentHeight/6,display.contentHeight/6)
-        CoordsX[#CoordsX+1]=(2*x2-1)*display.contentHeight/(2*mapSize)+randomScale*math.random(-display.contentWidth/6,display.contentWidth/6)
+        CoordsY[#CoordsY+1]=(2*y1-1)*_W/(2*mapSize)+randomScale*math.random(-_H/6,_H/6)
+        CoordsX[#CoordsX+1]=(2*x1-1)*_H/(2*mapSize)+randomScale*math.random(-_W/6,_W/6)
+        CoordsY[#CoordsY+1]=(2*y2-1)*_W/(2*mapSize)+randomScale*math.random(-_H/6,_H/6)
+        CoordsX[#CoordsX+1]=(2*x2-1)*_H/(2*mapSize)+randomScale*math.random(-_W/6,_W/6)
     end
     for i=1,numOfLines*2-1,1 do
         local line3=display.newLine(CoordsY[i],CoordsX[i],CoordsY[i+1],CoordsX[i+1])
