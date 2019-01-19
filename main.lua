@@ -3,9 +3,13 @@ display.setStatusBar(display.HiddenStatusBar)
 _W=display.contentWidth;
 _H=display.contentHeight;
 
-gridStrokeWidth=5
+gridStrokeWidth=3
 gridStrokeColor={0.9,0.7,0.4,1}
-local mapSize=3
+local mapSize=5
+local cellCenterX=_W/(mapSize*2)
+local cellCenterY=_H/(mapSize*2)
+local sizeXO = 1.2*cellCenterY
+
 rectangleScale=1.2
 
 for i=1,mapSize-1 do
@@ -25,7 +29,7 @@ for i=1,mapSize do
     cellMarker[i]={}
     for j=1,mapSize do
         myRectangle[i][j]=
-        display.newRect((i-1)*_W/6+i*_W/6,(j-1)*_H/6+j*_H/6,rectangleScale*_W/6,rectangleScale*_H/6)
+        display.newRect((i-1)*cellCenterX+i*cellCenterX,(j-1)*cellCenterY+j*cellCenterY,rectangleScale*cellCenterX,rectangleScale*cellCenterY)
         myRectangle[i][j]:setFillColor(0)
         cellMarker[i][j]=i..j
         
@@ -33,15 +37,15 @@ for i=1,mapSize do
             for i=1,mapSize do
                 for key,val in pairs(myRectangle[i]) do
                     if val==event.target and cellMarker[key][i]~="X" and cellMarker[key][i]~="O" then
-                        local tapSymbol=display.newText(currentStepSymbol,display.contentCenterX,_H/2,native.systemFont,100)
+                        local tapSymbol=display.newText(currentStepSymbol,display.contentCenterX,_H/2,native.systemFont,sizeXO)
                         cellMarker[key][i]=tapSymbol.text
                         tapSymbol.x,tapSymbol.y=event.x,event.y --кординаты символа = координаты события
                         if currentStepSymbol=='X' then currentStepSymbol="O"
                         else currentStepSymbol='X'
                         end
                         if(gameWinCheck(cellMarker)~=nil) then
-                            local gameEndText=display.newText(cellMarker[key][i].."-s Wins",display.contentCenterX,_H/2,native.systemFont,50)
                             drawWinLine(gameWinCheck(cellMarker))
+                            local gameEndText=display.newText(cellMarker[key][i].."-s Wins",display.contentCenterX,_H/2,native.systemFont,50)
                             gameEndText:setFillColor(1,0,0)
                         elseif (gameIsEnd(cellMarker)) then
                             local gameEndText=display.newText("Draw",display.contentCenterX,_H/2,native.systemFont,50)
@@ -67,14 +71,15 @@ function drawWinLine(coords)
     local numOfLines=math.random(3,7)
     local randomScale=0.7
     for i=1,numOfLines,1 do
-        CoordsY[#CoordsY+1]=(2*y1-1)*_W/(2*mapSize)+randomScale*math.random(-_H/6,_H/6)
-        CoordsX[#CoordsX+1]=(2*x1-1)*_H/(2*mapSize)+randomScale*math.random(-_W/6,_W/6)
-        CoordsY[#CoordsY+1]=(2*y2-1)*_W/(2*mapSize)+randomScale*math.random(-_H/6,_H/6)
-        CoordsX[#CoordsX+1]=(2*x2-1)*_H/(2*mapSize)+randomScale*math.random(-_W/6,_W/6)
+        CoordsY[#CoordsY+1]=(2*y1-1)*_W/(2*mapSize)+randomScale*math.random(-cellCenterY,cellCenterY)
+        CoordsX[#CoordsX+1]=(2*x1-1)*_H/(2*mapSize)+randomScale*math.random(-cellCenterX,cellCenterX)
+        CoordsY[#CoordsY+1]=(2*y2-1)*_W/(2*mapSize)+randomScale*math.random(-cellCenterY,cellCenterY)
+        CoordsX[#CoordsX+1]=(2*x2-1)*_H/(2*mapSize)+randomScale*math.random(-cellCenterX,cellCenterX)
     end
     for i=1,numOfLines*2-1,1 do
         local line3=display.newLine(CoordsY[i],CoordsX[i],CoordsY[i+1],CoordsX[i+1])
         line3.strokeWidth=math.random(1,3)
+        line3:setStrokeColor(0.5,0.8,0.5,1)
     end
 end
 
