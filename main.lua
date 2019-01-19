@@ -8,7 +8,7 @@ gridStrokeColor={0.9,0.7,0.4,1}
 local mapSize=5
 local cellCenterX=_W/(mapSize*2)
 local cellCenterY=_H/(mapSize*2)
-local sizeXO = 1.2*cellCenterY
+local sizeXO=1.2*cellCenterY
 
 rectangleScale=1.2
 
@@ -32,29 +32,34 @@ for i=1,mapSize do
         display.newRect((i-1)*cellCenterX+i*cellCenterX,(j-1)*cellCenterY+j*cellCenterY,rectangleScale*cellCenterX,rectangleScale*cellCenterY)
         myRectangle[i][j]:setFillColor(0)
         cellMarker[i][j]=i..j
-        
-        local function listener(event)
-            for i=1,mapSize do
-                for key,val in pairs(myRectangle[i]) do
-                    if val==event.target and cellMarker[key][i]~="X" and cellMarker[key][i]~="O" then
-                        local tapSymbol=display.newText(currentStepSymbol,display.contentCenterX,_H/2,native.systemFont,sizeXO)
-                        cellMarker[key][i]=tapSymbol.text
-                        tapSymbol.x,tapSymbol.y=event.x,event.y --кординаты символа = координаты события
-                        if currentStepSymbol=='X' then currentStepSymbol="O"
-                        else currentStepSymbol='X'
-                        end
-                        if(gameWinCheck(cellMarker)~=nil) then
-                            drawWinLine(gameWinCheck(cellMarker))
-                            local gameEndText=display.newText(cellMarker[key][i].."-s Wins",display.contentCenterX,_H/2,native.systemFont,50)
-                            gameEndText:setFillColor(1,0,0)
-                        elseif (gameIsEnd(cellMarker)) then
-                            local gameEndText=display.newText("Draw",display.contentCenterX,_H/2,native.systemFont,50)
-                            gameEndText:setFillColor(1,0,0)
-                        end
-                    end
+    end
+end
+
+local function listener(event)
+    for i=1,mapSize do
+        for key,val in pairs(myRectangle[i]) do
+            if val==event.target and cellMarker[key][i]~="X" and cellMarker[key][i]~="O" then
+                local tapSymbol=display.newText(currentStepSymbol,display.contentCenterX,_H/2,native.systemFont,sizeXO)
+                cellMarker[key][i]=tapSymbol.text
+                tapSymbol.x,tapSymbol.y=event.x,event.y --кординаты символа = координаты события
+                if currentStepSymbol=='X' then currentStepSymbol="O"
+                else currentStepSymbol='X'
+                end
+                if(gameWinCheck(cellMarker)~=nil) then
+                    drawWinLine(gameWinCheck(cellMarker))
+                    local gameEndText=display.newText(cellMarker[key][i].."-s Wins",display.contentCenterX,_H/2,native.systemFont,50)
+                    gameEndText:setFillColor(1,0,0)
+                elseif (gameIsEnd(cellMarker)) then
+                    local gameEndText=display.newText("Draw",display.contentCenterX,_H/2,native.systemFont,50)
+                    gameEndText:setFillColor(1,0,0)
                 end
             end
         end
+    end
+end
+
+for i=1,mapSize do
+    for j=1,mapSize do
         myRectangle[i][j]:addEventListener("tap",listener)
     end
 end
